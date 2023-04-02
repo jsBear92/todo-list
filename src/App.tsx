@@ -34,27 +34,33 @@ const App = () => {
       <div className="w-full max-w-lg">
         <h1 className="text-4xl font-bold mb-4">Todo List</h1>
         <input
-          className="flex w-full py-2 border border-blue-400 rounded-full focus:border-blue-600 focus:outline-none"
+          className="w-5/6 py-2 border-2 border-gray-400 rounded-full focus:border-blue-600 focus:outline-none"
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Enter a new task"
         />
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
+          className="w-1/6 px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-600 focus:outline-none"
           onClick={addTodo}
         >Add</button>
         <ul className="mt-4 space-y-2">
           {todos.map((todo) => (
             <li
               key={todo.id}
-              className="flex items-center space-x-2"
-              style={{ textDecoration: todo.completed ? "line-through" : "none" }}
+              className="flex w-full items-center space-x-2"
             >
-              <input type="checkbox" onChange={() => toggleTodo(todo.id)} checked={todo.completed} />
-              <span className="flex grow">{todo.text}</span>
+              <input
+                type="checkbox"
+                onChange={() => toggleTodo(todo.id)}
+                checked={todo.completed}
+              />
+              <span
+                className="flex grow"
+                style={{ textDecoration: todo.completed ? "line-through" : "none" }}
+              >{todo.text}</span>
               <button
-                className="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none"
+                className="w-1/6 px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none"
                 onClick={() => removeTodo(todo.id)}
               >Delete</button>
             </li>
