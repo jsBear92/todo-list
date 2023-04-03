@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type Todo = {
   id: number;
@@ -10,11 +10,26 @@ const App = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
 
+  useEffect(() => {
+    fetch("http://localhost:5000/api/todos")
+    .then(res => res.json())
+    .then(data => {
+      if (Array.isArray(data)) {
+        setTodos(data);
+      } else {
+        setTodos([]);
+        console.log("Error: data is not an array");
+      }
+    })
+    .catch((err) => {console.log(err.message)});
+  }, []);
+
   const addTodo = () => {
     if (inputValue.trim()) {
       setTodos([...todos, { id: Date.now(), text: inputValue, completed: false }]);
       setInputValue("");
     }
+    console.log(todos);
   };
 
   const toggleTodo = (id: number) => {
