@@ -9,7 +9,8 @@ app.use(cors());
 app.get('/api/todos', (req, res) => {
     const jsonData = [{
         id: '112545523',
-        text: 'ggg',
+        title: 'gg123',
+        text: 'test',
         completed: false,
     }];
 
