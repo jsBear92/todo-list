@@ -102,8 +102,9 @@ const updateTodo = (req, res) => {
         const todo = todos.find(el => el.id === id);
         const updatedTodo = req.body;
 
-        console.log(updatedTodo.title);
-        console.log(updatedTodo.text);
+        if (todo) {
+            Object.assign(todo, updatedTodo);
+        }
 
         if (todos.length === todo.length) {
             return res.status(404).json({
@@ -113,6 +114,13 @@ const updateTodo = (req, res) => {
         }
 
         fs.writeFile(`./todos.json`, JSON.stringify(todos, null, 2), err => {
+            if (err) {
+                console.error('Error writing the file:', err);
+                return res.status(500).json({
+                    status: 'fail',
+                    message: 'Error writing the file'
+                });
+            }
             res.status(200).json({
                 status: 'success',
                 data: {

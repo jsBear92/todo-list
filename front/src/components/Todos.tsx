@@ -37,12 +37,25 @@ const Todos: React.FC = () => {
     };
 
     const toggleTodo = (id: number) => {
+
         setTodos(
             todos.map((todo) =>
                 todo.id === id ? { ...todo, completed: !todo.completed } : todo
             )
         );
     };
+
+    const updateTodo = (id: number, title: string, text: string) => {
+        changeTodo(id, title, text);
+
+        fetch(`http://localhost:5000/api/todos/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({ title: title, text: text })
+        })
+        .then(res => res.json())
+        .catch(err => console.log('Error: ', err.message));
+    }
 
     const changeTodo = (id: number, title: string, text: string) => {
         setTodos(
@@ -99,7 +112,7 @@ const Todos: React.FC = () => {
                                 onClick={() => removeTodo(todo.id)}
                             >Delete</button>
                         </div>
-                        { todoClickId === todo.id && todoDetail ? <TodoDetail title={todo.title} text={todo.text} /> : null }
+                        { todoClickId === todo.id && todoDetail ? <TodoDetail todo={todo} onUpdate={updateTodo} /> : null }
                     </li>
                 ))}
             </ul>
