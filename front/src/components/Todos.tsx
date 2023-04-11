@@ -18,22 +18,22 @@ const Todos: React.FC = () => {
     fetch("http://localhost:5000/api/todos")
         .then(res => res.json())
         .then(data => {
-            if (Array.isArray(data)) {
-                setTodos(data);
-            } else {
-                setTodos([]);
-                console.log("Error: data is not an array");
-            }
+            setTodos(data.data.todos);
         })
         .catch((err) => {console.log(err.message)});
     }, []);
 
     const addTodo = () => {
         if (inputValue.trim()) {
-            setTodos([...todos, { id: Date.now(), title: inputValue, text:"", completed: false }]);
+            const newTodo = { id: Date.now(), title: inputValue, text:"", completed: false };
+            fetch('http://localhost:5000/api/todos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json'},
+                body: JSON.stringify(newTodo)
+            });
+            setTodos([...todos, newTodo]);
             setInputValue("");
         }
-        console.log(todos);
     };
 
     const toggleTodo = (id: number) => {
@@ -53,6 +53,10 @@ const Todos: React.FC = () => {
     }
 
     const removeTodo = (id: number) => {
+        fetch(`http://localhost:5000/api/todos/${id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json'},
+        })
         setTodos(todos.filter((todo) => todo.id !== id));
     };
 
