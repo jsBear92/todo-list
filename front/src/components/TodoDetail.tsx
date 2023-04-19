@@ -2,12 +2,12 @@ import { useState } from "react";
 
 interface Todo {
     todo: {
-        id: number;
+        id: string;
         title: string;
         text: string;
         completed: boolean;
     };
-    onUpdate: (id: number, title: string, text: string) => void;
+    onUpdate: (id: string, title: string, text: string) => void;
 }
 
 export const TodoDetail: React.FC<Todo> = ({ todo, onUpdate }) => {

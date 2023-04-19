@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { TodoDetail } from "./TodoDetail";
 
 type Todo = {
-    id: number;
+    id: string;
     title: string;
     text: string;
     completed: boolean;
@@ -11,32 +11,50 @@ type Todo = {
 const Todos: React.FC = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [inputValue, setInputValue] = useState<string>("");
-    const [todoClickId, setTodoClickId] = useState<number | null>(null);
+    const [todoClickId, setTodoClickId] = useState<string | null>(null);
     const [todoDetail, setTodoDetail] = useState<boolean>(false);
 
     useEffect(() => {
-    fetch("http://localhost:5000/api/todos")
-        .then(res => res.json())
+    fetch("https://4kundsudle.execute-api.ap-southeast-2.amazonaws.com/prod/todos", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(res =>  {
+            const resClone = res.clone();
+            resClone.text().then(text => console.log('Raw response:', text));
+            return res.json();
+          })
         .then(data => {
-            setTodos(data.data.todos);
+            setTodos(data.Items);
         })
         .catch((err) => {console.log(err.message)});
     }, []);
 
     const addTodo = () => {
         if (inputValue.trim()) {
-            const newTodo = { id: Date.now(), title: inputValue, text:"", completed: false };
-            fetch('http://localhost:5000/api/todos', {
+            const newTodo = { id: Date.now().toString(), title: inputValue, text:"", completed: false };
+            fetch('https://4kundsudle.execute-api.ap-southeast-2.amazonaws.com/prod/todos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json'},
-                body: JSON.stringify(newTodo)
-            });
+                body: JSON.stringify({ Item: newTodo })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        console.log('Error details:', error);
+                        throw new Error('Error posting todo: ' + error.message);
+                    });
+                }
+            })
+            .catch(err => console.log('Error: ', err.message));
             setTodos([...todos, newTodo]);
             setInputValue("");
         }
     };
 
-    const toggleTodo = (id: number) => {
+    const toggleTodo = (id: string) => {
 
         setTodos(
             todos.map((todo) =>
@@ -45,19 +63,26 @@ const Todos: React.FC = () => {
         );
     };
 
-    const updateTodo = (id: number, title: string, text: string) => {
+    const updateTodo = (id: string, title: string, text: string) => {
         changeTodo(id, title, text);
 
-        fetch(`http://localhost:5000/api/todos/${id}`, {
-            method: 'PATCH',
+        fetch(`https://4kundsudle.execute-api.ap-southeast-2.amazonaws.com/prod/todos/${id}`, {
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({ title: title, text: text })
+            body: JSON.stringify({ Item: { title: title, text: text } })
         })
-        .then(res => res.json())
+        .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        console.log('Error details:', error);
+                        throw new Error('Error posting todo: ' + error.message);
+                    });
+                }
+            })
         .catch(err => console.log('Error: ', err.message));
     }
 
-    const changeTodo = (id: number, title: string, text: string) => {
+    const changeTodo = (id: string, title: string, text: string) => {
         setTodos(
             todos.map((todo) =>
                 todo.id === id ? { ...todo, title: title, text: text } : todo
@@ -65,15 +90,15 @@ const Todos: React.FC = () => {
         );
     }
 
-    const removeTodo = (id: number) => {
-        fetch(`http://localhost:5000/api/todos/${id}`, {
+    const removeTodo = (id: string) => {
+        fetch(`https://4kundsudle.execute-api.ap-southeast-2.amazonaws.com/prod/todos/${id}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json'},
         })
         setTodos(todos.filter((todo) => todo.id !== id));
     };
 
-    const handleTodoClick = (id: number) => {
+    const handleTodoClick = (id: string) => {
         setTodoClickId(id);
         setTodoDetail(!todoDetail);
     };
